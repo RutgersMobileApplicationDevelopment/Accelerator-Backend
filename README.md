@@ -18,7 +18,7 @@ Each week we will cover a new topic different topic within Backend Development. 
 
 ## Mentors
 
-|Photo|Name|Contact|Fun fact|
-|---|---|---|---|
-|<img src="/instructor/ryan.jpg" width="200px" />|Aditya Shastri|[fb messenger](https://m.me/aditya.shastri.5055)|I apparently laugh while I sleep.|
-|<img src="/instructor/IMG_2310.jpg" width="200px" />|Alex Parson|[fb messenger](https://m.me/alex.emerson.33)|I wave flags in front of fast cars and bikes from time to time.|
+|Photo|Name|Contact|
+|---|---|---|
+|<img src="/instructor/ryan.jpg" width="200px" />|Aditya Shastri|[fb messenger](https://m.me/aditya.shastri.5055)|
+|<img src="/instructor/IMG_2310.jpg" width="200px" />|Alex Parson|[fb messenger](https://m.me/alex.emerson.33)|
