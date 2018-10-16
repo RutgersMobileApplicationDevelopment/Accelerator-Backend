@@ -8,13 +8,19 @@ These are the materials for the Backend Track of the Accelerator. Feel free to u
 
 Each week we will cover a new topic different topic within Backend Development. You can expect to learn the following:
 
-* How to program in Swift
-* How to create user interfaces with Interface Builder and Storyboards
-* Making flexible user interfaces with Auto Layout
-* Navigation between screens
-* Table views and Collections views
-* Making network requests
-* Saving data locally
+* Basic python
+* Understanding what a server and HTTP is
+* Using flask to make a server
+* Handling different types of requests, JSON
+* Designing an API
+* Using third party tools/APIs
+* Storing data in a database
+* Using MongoDB
+
+And hopefully
+* Authentication
+* Hosting a service on AWS
+* Scaling a service
 
 ## Mentors
 
