@@ -8,7 +8,8 @@ def restaurant_list():
     if request.method == 'GET':
         return ", ".join(users)
     else:
-        users.append(request.get_json['user'])
+        users.append(request.get_json()['user'])
+        return "Done."
 
 @app.route("/user/<username>", methods=["DELETE", "PUT"])
 def get_user(username):
