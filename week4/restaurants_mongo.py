@@ -22,7 +22,6 @@ ratings = {}
 def restaurant_list():
     if request.method == 'GET':
         restaurant_coll = restaurant_db['restaurants']
-        print(list(restaurant_coll.find()))
         return JSONEncoder().encode(list(restaurant_coll.find()))
     else:
         # restaurants.append(request.get_json()['restaurant'])
