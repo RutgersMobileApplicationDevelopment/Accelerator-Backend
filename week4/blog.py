@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 import json
 from pymongo import MongoClient
 from bson import ObjectId
@@ -19,7 +19,7 @@ blog_db = client['blog-db']
 def users():
     if request.method == 'GET':
         users = blog_db['users']
-        return JSONEncoder().encode(list(users.find()))
+        return Response(JSONEncoder().encode(list(users.find())), mimetype='application/json')
     else:
         body = request.get_json()
         users = blog_db["users"]
@@ -30,4 +30,48 @@ def users():
             "created": str(datetime.datetime.now())
         }
         users.insert_one(user)
+        return "Done."
+
+@app.route("/posts", methods=["POST", "GET"])
+def posts():
+    if request.method == 'POST':
+        body = request.get_json()
+        post = {
+            "title": body["title"],
+            "body": body["body"],
+            "userid": body["userid"],
+            "name": body["name"],
+            "created": str(datetime.datetime.now()),
+            "comments": []
+        }
+        posts = blog_db["posts"]
+        posts.insert_one(post)
+        return "Done."
+    else:
+        posts = blog_db["posts"]
+        return Response(JSONEncoder().encode(list(posts.find())), mimetype='application/json')
+
+@app.route("/posts/<postid>", methods=["DELETE", "GET"])
+def single_post(postid):
+    if request.method == 'GET':
+        posts = blog_db["posts"]
+        return Response(JSONEncoder().encode(posts.find_one({"_id": ObjectId(postid)})), mimetype='application/json')
+    else:
+        posts = blog_db["posts"]
+        posts.delete_one({"_id": ObjectId(postid)})
+        return "Done."
+
+@app.route("/posts/<postid>/comments", methods=["POST", "GET"])
+def comments(postid):
+    if request.method == 'GET':
+        return Response(JSONEncoder().encode(posts.find_one({"_id": ObjectId(postid)})["comments"]), mimetype='application/json')
+    else:
+        body = request.get_json()
+        new_comment = {
+            "body": body["body"],
+            "userid": body["userid"],
+            "name": body["name"]
+        }
+        posts = blog_db["posts"]
+        posts.update_one({"_id": ObjectId(postid)}, {"$push": {"comments": new_comment}})
         return "Done."
