@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, Response
+from functools import wraps
 import json
 from pymongo import MongoClient
 from bson import ObjectId
@@ -14,6 +15,29 @@ class JSONEncoder(json.JSONEncoder):
 client = MongoClient('localhost', 27017)
 
 blog_db = client['blog-db']
+
+def check_credentials(username, password):
+    users_coll = blog_db['users']
+    user = users_coll.find_one({"username": username})
+    if user is None:
+        return False
+    if user['password'] != password:
+        return False
+    return True
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.headers.get('Auth')
+        if auth is None:
+            return "invalid"
+        tokens = auth.split(':')
+        if len(tokens) != 2:
+            return "invalid"
+        if not auth or not check_credentials(tokens[0], tokens[1]):
+            return "invalid"
+        return f(*args, **kwargs)
+    return decorated
 
 @app.route("/users", methods=["POST", "GET"])
 def users():
@@ -32,24 +56,30 @@ def users():
         users.insert_one(user)
         return "Done."
 
-@app.route("/posts", methods=["POST", "GET"])
+@app.route("/posts", methods=["POST"])
+@requires_auth
 def posts():
-    if request.method == 'POST':
-        body = request.get_json()
-        post = {
-            "title": body["title"],
-            "body": body["body"],
-            "userid": body["userid"],
-            "name": body["name"],
-            "created": str(datetime.datetime.now()),
-            "comments": []
-        }
-        posts = blog_db["posts"]
-        posts.insert_one(post)
-        return "Done."
-    else:
-        posts = blog_db["posts"]
-        return Response(JSONEncoder().encode(list(posts.find())), mimetype='application/json')
+    # if request.method == 'POST':
+    body = request.get_json()
+    post = {
+        "title": body["title"],
+        "body": body["body"],
+        "userid": body["userid"],
+        "name": body["name"],
+        "created": str(datetime.datetime.now()),
+        "comments": []
+    }
+    posts = blog_db["posts"]
+    posts.insert_one(post)
+    return "Done."
+    # else:
+    #     posts = blog_db["posts"]
+    #     return Response(JSONEncoder().encode(list(posts.find())), mimetype='application/json')
+
+@app.route("/posts", methods=["GET"])
+def get_posts():
+    posts = blog_db["posts"]
+    return Response(JSONEncoder().encode(list(posts.find())), mimetype='application/json')
 
 @app.route("/posts/<postid>", methods=["DELETE", "GET"])
 def single_post(postid):
@@ -64,6 +94,7 @@ def single_post(postid):
 @app.route("/posts/<postid>/comments", methods=["POST", "GET"])
 def comments(postid):
     if request.method == 'GET':
+        posts = blog_db["posts"]
         return Response(JSONEncoder().encode(posts.find_one({"_id": ObjectId(postid)})["comments"]), mimetype='application/json')
     else:
         body = request.get_json()
